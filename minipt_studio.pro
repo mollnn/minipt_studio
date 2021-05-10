@@ -26,7 +26,8 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        glwidget.cpp
+        glwidget.cpp \
+        camera.cpp
 
 HEADERS += \
         glwidget.h

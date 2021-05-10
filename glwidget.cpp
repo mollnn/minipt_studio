@@ -1,8 +1,55 @@
 #include "glwidget.h"
+#include <QtMath>
 
 GlWidget::GlWidget(QWidget *parent)
-    : QOpenGLWidget(parent)
+    : QOpenGLWidget(parent), VBO(QOpenGLBuffer::VertexBuffer), camera(this)
 {
+    vertices = {
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
+
+    timer.setInterval(18);
+    connect(&timer, &QTimer::timeout, this, static_cast<void (GlWidget::*)()>(&GlWidget::update));
+    timer.start();
 }
 
 GlWidget::~GlWidget()
@@ -12,52 +59,54 @@ GlWidget::~GlWidget()
 void GlWidget::initializeGL()
 {
     this->initializeOpenGLFunctions(); //初始化opengl函数
-
-    static const char *VERTEX_SHADER_CODE =
-        "#version 330 \n"
-        "layout(location = 0) in vec3 posVertex;\n"
-        "void main() {\n"
-        "  gl_Position = vec4(posVertex, 1.0f);\n"
-        "}\n";
-
-    static const char *FRAGMENT_SHADER_CODE =
-        "#version 330\n"
-        "out vec4 fragColor;\n"
-        "void main() {\n"
-        "  fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
-        "}\n";
-
-    m_shader = new QOpenGLShaderProgram();
-    m_shader->addShaderFromSourceCode(QOpenGLShader::Vertex, VERTEX_SHADER_CODE);
-    m_shader->addShaderFromSourceCode(QOpenGLShader::Fragment, FRAGMENT_SHADER_CODE);
-    if (m_shader->link())
-    {
-        qDebug("Shaders link success.");
+    if (!shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "./triangle.vs"))
+    {                                                //添加并编译顶点着色器
+        qDebug() << "ERROR:" << shaderProgram.log(); //如果编译出错,打印报错信息
     }
-    else
-    {
-        qDebug("Shaders link failed!");
+    if (!shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "./triangle.frag"))
+    {                                                //添加并编译片段着色器
+        qDebug() << "ERROR:" << shaderProgram.log(); //如果编译出错,打印报错信息
+    }
+    if (!shaderProgram.link())
+    {                                                //链接着色器
+        qDebug() << "ERROR:" << shaderProgram.log(); //如果链接出错,打印报错信息
     }
 
-    m_vao = new QOpenGLVertexArrayObject();
-    m_vbo = new QOpenGLBuffer(QOpenGLBuffer::Type::VertexBuffer);
-    m_vao->create();
-    m_vao->bind();
+    QOpenGLVertexArrayObject::Binder{&VAO};
 
-    static const GLfloat VERTEX_DATA[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f};
-    m_vbo->create();
-    m_vbo->bind();
-    m_vbo->allocate(VERTEX_DATA, 3 * 3 * sizeof(GLfloat));
+    VBO.create(); //生成VBO对象
+    VBO.bind();   //将VBO绑定到当前的顶点缓冲对象（QOpenGLBuffer::VertexBuffer）中
 
-    QOpenGLFunctions *f = this->context()->functions();
-    f->glEnableVertexAttribArray(0);
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    //将顶点数据分配到VBO中，第一个参数为数据指针，第二个参数为数据的字节长度
+    VBO.allocate(vertices.data(), sizeof(float) * vertices.size());
 
-    m_vbo->release();
-    m_vao->release();
+    //设置顶点解析格式，并启用顶点
+    shaderProgram.setAttributeBuffer("aPos", GL_FLOAT, 0, 3, sizeof(GLfloat) * 6);
+    shaderProgram.enableAttributeArray("aPos");
+    shaderProgram.setAttributeBuffer("aNormal", GL_FLOAT, sizeof(GLfloat) * 3, 3, sizeof(GLfloat) * 6);
+    shaderProgram.enableAttributeArray("aNormal");
+
+    if (!lampShader.addShaderFromSourceFile(QOpenGLShader::Vertex, "./triangle.vs"))
+    {                                                //添加并编译顶点着色器
+        qDebug() << "ERROR:" << shaderProgram.log(); //如果编译出错,打印报错信息
+    }
+    if (!lampShader.addShaderFromSourceFile(QOpenGLShader::Fragment, "./triangle.frag"))
+    {                                                //添加并编译片段着色器
+        qDebug() << "ERROR:" << shaderProgram.log(); //如果编译出错,打印报错信息
+    }
+    if (!lampShader.link())
+    {                                                //链接着色器
+        qDebug() << "ERROR:" << shaderProgram.log(); //如果链接出错,打印报错信息
+    }
+
+    QOpenGLVertexArrayObject::Binder{&lightVAO};
+    VBO.bind(); //只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
+    lampShader.setAttributeBuffer("aPos", GL_FLOAT, 0, 3, sizeof(GLfloat) * 6);
+    lampShader.enableAttributeArray("aPos");
+
+    this->glEnable(GL_DEPTH_TEST);
+
+    camera.init();
 }
 
 void GlWidget::resizeGL(int w, int h)
@@ -67,12 +116,46 @@ void GlWidget::resizeGL(int w, int h)
 
 void GlWidget::paintGL()
 {
-    QOpenGLFunctions *f = this->context()->functions();
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    f->glClearColor(0.1f, 0.4f, 0.6f, 1.0f);
-    m_vao->bind();
-    m_shader->bind();
-    f->glDrawArrays(GL_TRIANGLES, 0, 3);
-    m_shader->release();
-    m_vao->release();
+    this->glClearColor(0.0f, 0.0f, 0.0f, 1.0f);               //设置清屏颜色
+    this->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //清除颜色缓存和深度缓存
+    float time = QTime::currentTime().msecsSinceStartOfDay() / 1000.0;
+    shaderProgram.bind();
+
+    QVector3D lightColor(1.0f, 1.0f, 1.0f);
+    QVector3D objectColor(1.0f, 0.5f, 0.31f);
+    QVector3D lightPos(-4.0f, 0.0f, 0.5f);
+
+    shaderProgram.setUniformValue("objectColor", objectColor);
+    shaderProgram.setUniformValue("lightColor", lightColor);
+
+    QMatrix4x4 model;
+    shaderProgram.setUniformValue("model", model);
+    shaderProgram.setUniformValue("view", camera.getView());
+
+    shaderProgram.setUniformValue("lightPos", lightPos);
+    shaderProgram.setUniformValue("viewPos", camera.getCameraPos());
+
+    QMatrix4x4 projection;
+    projection.perspective(45.0f, width() / (float)height(), 0.1f, 100.0f);
+    shaderProgram.setUniformValue("projection", projection);
+    QOpenGLVertexArrayObject::Binder{&VAO};
+    this->glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    lampShader.bind();
+
+    model.translate(lightPos);
+    model.scale(0.2);
+    lampShader.setUniformValue("model", model);
+    lampShader.setUniformValue("view", camera.getView());
+    lampShader.setUniformValue("projection", projection);
+
+    QOpenGLVertexArrayObject::Binder{&lightVAO};
+    this->glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+bool GlWidget::event(QEvent *e)
+{
+    camera.handle(e);
+    
+    return QWidget::event(e); //调用父类的事件分发函数
 }

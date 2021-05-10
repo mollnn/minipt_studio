@@ -53,9 +53,11 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = main.cpp \
-		glwidget.cpp moc_glwidget.cpp
+		glwidget.cpp \
+		camera.cpp moc_glwidget.cpp
 OBJECTS       = main.o \
 		glwidget.o \
+		camera.o \
 		moc_glwidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -134,7 +136,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		minipt_studio.pro glwidget.h main.cpp \
-		glwidget.cpp
+		glwidget.cpp \
+		camera.cpp
 QMAKE_TARGET  = minipt_studio
 DESTDIR       = 
 TARGET        = minipt_studio
@@ -317,7 +320,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents glwidget.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp glwidget.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp glwidget.cpp camera.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -353,6 +356,7 @@ compiler_moc_header_make_all: moc_glwidget.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_glwidget.cpp
 moc_glwidget.cpp: glwidget.h \
+		camera.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/mollnn/minipt_studio/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/mollnn/minipt_studio -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include glwidget.h -o moc_glwidget.cpp
@@ -373,11 +377,16 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-main.o: main.cpp glwidget.h
+main.o: main.cpp glwidget.h \
+		camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
-glwidget.o: glwidget.cpp glwidget.h
+glwidget.o: glwidget.cpp glwidget.h \
+		camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o glwidget.o glwidget.cpp
+
+camera.o: camera.cpp camera.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o camera.o camera.cpp
 
 moc_glwidget.o: moc_glwidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_glwidget.o moc_glwidget.cpp
