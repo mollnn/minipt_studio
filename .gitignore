@@ -1,2 +1,5 @@
 .vscode
 minipt_studio
+*.stash
+*.o
+moc*
