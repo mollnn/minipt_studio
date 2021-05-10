@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2021-05-09T21:12:53
+# Project created by QtCreator 2021-05-09T22:38:36
 #
 #-------------------------------------------------
 
@@ -30,9 +30,6 @@ SOURCES += \
 
 HEADERS += \
         widget.h
-
-FORMS += \
-        widget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
