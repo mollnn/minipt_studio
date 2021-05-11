@@ -3,7 +3,7 @@
 #include <QDebug>
 
 Camera::Camera(QWidget *widget)
-    : widget(widget), yaw(0), pitch(0), sensitivity(0.001f), cameraPos(-5.0f, 0.0f, 0.0f),
+    : widget(widget), yaw(0), pitch(0), sensitivity(0.005f), cameraPos(-5.0f, 0.0f, 0.0f),
       cameraDirection(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)),
       cameraRight(QVector3D::crossProduct({0.0f, 1.0f, 0.0f}, cameraDirection)),
       cameraUp(QVector3D::crossProduct(cameraDirection, cameraRight)), moveSpeed(0.5f), timeId(0),
@@ -92,6 +92,10 @@ void Camera::handle(QEvent *e)
     }
     else if (e->type() == QEvent::Timer)
     {
+        float time = QTime::currentTime().msecsSinceStartOfDay() / 1000.0;
+        deltaTime = time - lastFrame; //在此处更新时间差
+        lastFrame = time;
+        deltaTime = std::min(deltaTime, 0.1f);
         qDebug("event: timer");
         for (auto i : keys)
             qDebug("%d", i);

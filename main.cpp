@@ -3,6 +3,8 @@
 #include <QTextEdit>
 #include <QGridLayout>
 
+#include <minipt/minipt.hpp>
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -25,6 +27,12 @@ int main(int argc, char *argv[])
     pWindow->setLayout(pGridLayout);
 
     pWindow->show();
+
+    Minipt minipt;
+	minipt.LoadDefaultLightset();
+	minipt.AutoNormal();
+	Image image = minipt.Render();
+	image.WriteToTGA("output.tga");
 
     return a.exec();
 }

@@ -378,7 +378,24 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 ####### Compile
 
 main.o: main.cpp glwidget.h \
-		camera.h
+		camera.h \
+		minipt/minipt.hpp \
+		minipt/uint.h \
+		minipt/vec3.hpp \
+		minipt/image.hpp \
+		minipt/color.hpp \
+		minipt/tgaimage.hpp \
+		minipt/timer.hpp \
+		minipt/fastmath.hpp \
+		minipt/random.hpp \
+		minipt/material.hpp \
+		minipt/triangle.hpp \
+		minipt/spherical.hpp \
+		minipt/scene.hpp \
+		minipt/pathtracer.hpp \
+		minipt/renderer.hpp \
+		minipt/testscene.hpp \
+		minipt/objloader.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 glwidget.o: glwidget.cpp glwidget.h \
