@@ -28,11 +28,5 @@ int main(int argc, char *argv[])
 
     pWindow->show();
 
-    Minipt minipt;
-	minipt.LoadDefaultLightset();
-	minipt.AutoNormal();
-	Image image = minipt.Render();
-	image.WriteToTGA("output.tga");
-
     return a.exec();
 }

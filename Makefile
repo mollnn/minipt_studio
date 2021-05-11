@@ -54,10 +54,32 @@ OBJECTS_DIR   = ./
 
 SOURCES       = main.cpp \
 		glwidget.cpp \
-		camera.cpp moc_glwidget.cpp
+		camera.cpp \
+		minipt/color.cpp \
+		minipt/image.cpp \
+		minipt/minipt.cpp \
+		minipt/pathtracer.cpp \
+		minipt/random.cpp \
+		minipt/renderer.cpp \
+		minipt/testscene.cpp \
+		minipt/tgaimage.cpp \
+		minipt/timer.cpp \
+		minipt/triangle.cpp \
+		minipt/vec3.cpp moc_glwidget.cpp
 OBJECTS       = main.o \
 		glwidget.o \
 		camera.o \
+		color.o \
+		image.o \
+		minipt.o \
+		pathtracer.o \
+		random.o \
+		renderer.o \
+		testscene.o \
+		tgaimage.o \
+		timer.o \
+		triangle.o \
+		vec3.o \
 		moc_glwidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -137,7 +159,18 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		minipt_studio.pro glwidget.h main.cpp \
 		glwidget.cpp \
-		camera.cpp
+		camera.cpp \
+		minipt/color.cpp \
+		minipt/image.cpp \
+		minipt/minipt.cpp \
+		minipt/pathtracer.cpp \
+		minipt/random.cpp \
+		minipt/renderer.cpp \
+		minipt/testscene.cpp \
+		minipt/tgaimage.cpp \
+		minipt/timer.cpp \
+		minipt/triangle.cpp \
+		minipt/vec3.cpp
 QMAKE_TARGET  = minipt_studio
 DESTDIR       = 
 TARGET        = minipt_studio
@@ -320,7 +353,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents glwidget.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp glwidget.cpp camera.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp glwidget.cpp camera.cpp minipt/color.cpp minipt/image.cpp minipt/minipt.cpp minipt/pathtracer.cpp minipt/random.cpp minipt/renderer.cpp minipt/testscene.cpp minipt/tgaimage.cpp minipt/timer.cpp minipt/triangle.cpp minipt/vec3.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -357,6 +390,19 @@ compiler_moc_header_clean:
 	-$(DEL_FILE) moc_glwidget.cpp
 moc_glwidget.cpp: glwidget.h \
 		camera.h \
+		minipt/minipt.hpp \
+		minipt/vec3.hpp \
+		minipt/image.hpp \
+		minipt/color.hpp \
+		minipt/tgaimage.hpp \
+		minipt/timer.hpp \
+		minipt/random.hpp \
+		minipt/material.hpp \
+		minipt/triangle.hpp \
+		minipt/scene.hpp \
+		minipt/pathtracer.hpp \
+		minipt/renderer.hpp \
+		minipt/testscene.hpp \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/mollnn/minipt_studio/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/mollnn/minipt_studio -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include glwidget.h -o moc_glwidget.cpp
@@ -380,30 +426,111 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 main.o: main.cpp glwidget.h \
 		camera.h \
 		minipt/minipt.hpp \
-		minipt/uint.h \
 		minipt/vec3.hpp \
 		minipt/image.hpp \
 		minipt/color.hpp \
 		minipt/tgaimage.hpp \
 		minipt/timer.hpp \
-		minipt/fastmath.hpp \
 		minipt/random.hpp \
 		minipt/material.hpp \
 		minipt/triangle.hpp \
-		minipt/spherical.hpp \
 		minipt/scene.hpp \
 		minipt/pathtracer.hpp \
 		minipt/renderer.hpp \
-		minipt/testscene.hpp \
-		minipt/objloader.hpp
+		minipt/testscene.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 glwidget.o: glwidget.cpp glwidget.h \
-		camera.h
+		camera.h \
+		minipt/minipt.hpp \
+		minipt/vec3.hpp \
+		minipt/image.hpp \
+		minipt/color.hpp \
+		minipt/tgaimage.hpp \
+		minipt/timer.hpp \
+		minipt/random.hpp \
+		minipt/material.hpp \
+		minipt/triangle.hpp \
+		minipt/scene.hpp \
+		minipt/pathtracer.hpp \
+		minipt/renderer.hpp \
+		minipt/testscene.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o glwidget.o glwidget.cpp
 
 camera.o: camera.cpp camera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o camera.o camera.cpp
+
+color.o: minipt/color.cpp minipt/color.hpp \
+		minipt/vec3.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o color.o minipt/color.cpp
+
+image.o: minipt/image.cpp minipt/image.hpp \
+		minipt/color.hpp \
+		minipt/vec3.hpp \
+		minipt/tgaimage.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o image.o minipt/image.cpp
+
+minipt.o: minipt/minipt.cpp minipt/minipt.hpp \
+		minipt/vec3.hpp \
+		minipt/image.hpp \
+		minipt/color.hpp \
+		minipt/tgaimage.hpp \
+		minipt/timer.hpp \
+		minipt/random.hpp \
+		minipt/material.hpp \
+		minipt/triangle.hpp \
+		minipt/scene.hpp \
+		minipt/pathtracer.hpp \
+		minipt/renderer.hpp \
+		minipt/testscene.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o minipt.o minipt/minipt.cpp
+
+pathtracer.o: minipt/pathtracer.cpp minipt/pathtracer.hpp \
+		minipt/vec3.hpp \
+		minipt/timer.hpp \
+		minipt/random.hpp \
+		minipt/material.hpp \
+		minipt/triangle.hpp \
+		minipt/scene.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pathtracer.o minipt/pathtracer.cpp
+
+random.o: minipt/random.cpp minipt/random.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o random.o minipt/random.cpp
+
+renderer.o: minipt/renderer.cpp minipt/renderer.hpp \
+		minipt/image.hpp \
+		minipt/color.hpp \
+		minipt/vec3.hpp \
+		minipt/tgaimage.hpp \
+		minipt/pathtracer.hpp \
+		minipt/timer.hpp \
+		minipt/random.hpp \
+		minipt/material.hpp \
+		minipt/triangle.hpp \
+		minipt/scene.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o renderer.o minipt/renderer.cpp
+
+testscene.o: minipt/testscene.cpp minipt/testscene.hpp \
+		minipt/scene.hpp \
+		minipt/triangle.hpp \
+		minipt/vec3.hpp \
+		minipt/material.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o testscene.o minipt/testscene.cpp
+
+tgaimage.o: minipt/tgaimage.cpp minipt/tgaimage.hpp \
+		minipt/vec3.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tgaimage.o minipt/tgaimage.cpp
+
+timer.o: minipt/timer.cpp minipt/timer.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o timer.o minipt/timer.cpp
+
+triangle.o: minipt/triangle.cpp minipt/triangle.hpp \
+		minipt/vec3.hpp \
+		minipt/material.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o triangle.o minipt/triangle.cpp
+
+vec3.o: minipt/vec3.cpp minipt/vec3.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vec3.o minipt/vec3.cpp
 
 moc_glwidget.o: moc_glwidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_glwidget.o moc_glwidget.cpp

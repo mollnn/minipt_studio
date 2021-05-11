@@ -13,6 +13,10 @@
 #include <QTime>
 #include <QtMath>
 #include <QKeyEvent>
+
+#include <minipt/minipt.hpp>
+
+
 class GlWidget : public QOpenGLWidget, public QOpenGLExtraFunctions
 {
     Q_OBJECT
@@ -22,6 +26,8 @@ public:
     ~GlWidget();
 
 protected:
+    void rebuildVertexArray();
+
     virtual void initializeGL() override;
     virtual void resizeGL(int w, int h) override;
     virtual void paintGL() override;
@@ -37,6 +43,8 @@ private:
     QOpenGLVertexArrayObject VAO;
     QOpenGLVertexArrayObject lightVAO;
     QTimer timer;
+
+    Minipt minipt;
 
     Camera camera;
 };

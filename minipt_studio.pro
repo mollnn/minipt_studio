@@ -27,7 +27,9 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         glwidget.cpp \
-        camera.cpp
+        camera.cpp \
+        # minipt module
+        minipt/*.cpp
 
 HEADERS += \
         glwidget.h
