@@ -61,6 +61,17 @@ void Camera::setCameraPos(const QVector3D &value)
     cameraPos = value;
 }
 
+
+QVector3D Camera::getCameraDir() const
+{
+    return cameraDirection;
+}
+
+void Camera::setCameraDir(const QVector3D &value)
+{
+    cameraDirection = value;
+}
+
 void Camera::handle(QEvent *e)
 {
     if (e->type() == QEvent::MouseMove)

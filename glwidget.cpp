@@ -31,7 +31,7 @@ void GlWidget::initializeGL()
         qDebug() << "ERROR:" << shaderProgram.log(); //如果链接出错,打印报错信息
     }
 
-    minipt.scene.triangles.push_back({{0,0,0},{0,0,1},{0,1,0}});
+    minipt.scene.triangles.push_back({{0, 0, 0}, {0, 0, 1}, {0, 1, 0}});
     minipt.AutoNormal();
     rebuildVertexArray();
 
@@ -54,7 +54,10 @@ void GlWidget::paintGL()
 
     QVector3D lightColor(1.0f, 1.0f, 1.0f);
     QVector3D objectColor(1.0f, 0.5f, 0.31f);
-    QVector3D lightPos(4.0f, 0.2f, 0.5f);
+    // QVector3D lightPos(4.0f, 0.2f, 0.5f);
+    QVector3D cameraPos = camera.getCameraPos();
+    QVector3D cameraDir = camera.getCameraDir();
+    QVector3D lightPos = cameraPos - cameraDir;
 
     shaderProgram.setUniformValue("objectColor", objectColor);
     shaderProgram.setUniformValue("lightColor", lightColor);
@@ -70,7 +73,7 @@ void GlWidget::paintGL()
     projection.perspective(45.0f, width() / (float)height(), 0.1f, 100.0f);
     shaderProgram.setUniformValue("projection", projection);
     QOpenGLVertexArrayObject::Binder{&VAO};
-    this->glDrawArrays(GL_TRIANGLES, 0, vertices.size() /6);
+    this->glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 6);
 }
 
 bool GlWidget::event(QEvent *e)

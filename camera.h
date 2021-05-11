@@ -30,6 +30,9 @@ public:
     QVector3D getCameraPos() const;
     void setCameraPos(const QVector3D &value);
 
+    QVector3D getCameraDir() const;
+    void setCameraDir(const QVector3D &value);
+
     void init(); //初始化摄像机
 
     void handle(QEvent *event); //处理窗口事件
