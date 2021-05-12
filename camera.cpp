@@ -107,11 +107,7 @@ void Camera::handle(QEvent *e)
         deltaTime = time - lastFrame; //在此处更新时间差
         lastFrame = time;
         deltaTime = std::min(deltaTime, 0.1f);
-        qDebug("event: timer");
-        for (auto i : keys)
-            qDebug("%d", i);
         float cameraSpeed = moveSpeed * deltaTime;
-        qDebug("moveSpeed = %f, deltaTime = %f", moveSpeed, deltaTime);
         if (keys.contains(Qt::Key_W)) //前
             cameraPos += cameraSpeed * cameraDirection;
         if (keys.contains(Qt::Key_S)) //后

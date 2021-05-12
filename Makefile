@@ -16,7 +16,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -O2 -std=gnu++1z -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtOpenGL -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
@@ -65,7 +65,9 @@ SOURCES       = main.cpp \
 		minipt/tgaimage.cpp \
 		minipt/timer.cpp \
 		minipt/triangle.cpp \
-		minipt/vec3.cpp moc_glwidget.cpp
+		minipt/vec3.cpp \
+		cmdedit.cpp moc_glwidget.cpp \
+		moc_cmdedit.cpp
 OBJECTS       = main.o \
 		glwidget.o \
 		camera.o \
@@ -80,7 +82,9 @@ OBJECTS       = main.o \
 		timer.o \
 		triangle.o \
 		vec3.o \
-		moc_glwidget.o
+		cmdedit.o \
+		moc_glwidget.o \
+		moc_cmdedit.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -157,7 +161,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		minipt_studio.pro glwidget.h main.cpp \
+		minipt_studio.pro glwidget.h \
+		cmdedit.h main.cpp \
 		glwidget.cpp \
 		camera.cpp \
 		minipt/color.cpp \
@@ -170,7 +175,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		minipt/tgaimage.cpp \
 		minipt/timer.cpp \
 		minipt/triangle.cpp \
-		minipt/vec3.cpp
+		minipt/vec3.cpp \
+		cmdedit.cpp
 QMAKE_TARGET  = minipt_studio
 DESTDIR       = 
 TARGET        = minipt_studio
@@ -352,8 +358,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents glwidget.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp glwidget.cpp camera.cpp minipt/color.cpp minipt/image.cpp minipt/minipt.cpp minipt/pathtracer.cpp minipt/random.cpp minipt/renderer.cpp minipt/testscene.cpp minipt/tgaimage.cpp minipt/timer.cpp minipt/triangle.cpp minipt/vec3.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents glwidget.h cmdedit.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp glwidget.cpp camera.cpp minipt/color.cpp minipt/image.cpp minipt/minipt.cpp minipt/pathtracer.cpp minipt/random.cpp minipt/renderer.cpp minipt/testscene.cpp minipt/tgaimage.cpp minipt/timer.cpp minipt/triangle.cpp minipt/vec3.cpp cmdedit.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -383,11 +389,11 @@ compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc_predefs.h
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O2 -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+	g++ -pipe -O2 -std=gnu++1z -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_glwidget.cpp
+compiler_moc_header_make_all: moc_glwidget.cpp moc_cmdedit.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_glwidget.cpp
+	-$(DEL_FILE) moc_glwidget.cpp moc_cmdedit.cpp
 moc_glwidget.cpp: glwidget.h \
 		camera.h \
 		minipt/minipt.hpp \
@@ -406,6 +412,11 @@ moc_glwidget.cpp: glwidget.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/mollnn/minipt_studio/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/mollnn/minipt_studio -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include glwidget.h -o moc_glwidget.cpp
+
+moc_cmdedit.cpp: cmdedit.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/mollnn/minipt_studio/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/mollnn/minipt_studio -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include cmdedit.h -o moc_cmdedit.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -437,7 +448,8 @@ main.o: main.cpp glwidget.h \
 		minipt/scene.hpp \
 		minipt/pathtracer.hpp \
 		minipt/renderer.hpp \
-		minipt/testscene.hpp
+		minipt/testscene.hpp \
+		cmdedit.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 glwidget.o: glwidget.cpp glwidget.h \
@@ -532,8 +544,14 @@ triangle.o: minipt/triangle.cpp minipt/triangle.hpp \
 vec3.o: minipt/vec3.cpp minipt/vec3.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vec3.o minipt/vec3.cpp
 
+cmdedit.o: cmdedit.cpp cmdedit.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cmdedit.o cmdedit.cpp
+
 moc_glwidget.o: moc_glwidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_glwidget.o moc_glwidget.cpp
+
+moc_cmdedit.o: moc_cmdedit.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_cmdedit.o moc_cmdedit.cpp
 
 ####### Install
 

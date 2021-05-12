@@ -5,7 +5,6 @@ GlWidget::GlWidget(QWidget *parent)
     : QOpenGLWidget(parent), VBO(QOpenGLBuffer::VertexBuffer), camera(this)
 {
     vertices = {};
-
     timer.setInterval(18);
     connect(&timer, &QTimer::timeout, this, static_cast<void (GlWidget::*)()>(&GlWidget::update));
     timer.start();
@@ -86,6 +85,7 @@ bool GlWidget::event(QEvent *e)
 void GlWidget::rebuildVertexArray()
 {
     this->vertices.clear();
+    minipt.AutoNormal();
     for (auto t : minipt.scene.triangles)
     {
         this->vertices.push_back(t.p0.x);
@@ -123,4 +123,24 @@ void GlWidget::rebuildVertexArray()
     shaderProgram.enableAttributeArray("aPos");
     shaderProgram.setAttributeBuffer("aNormal", GL_FLOAT, sizeof(GLfloat) * 3, 3, sizeof(GLfloat) * 6);
     shaderProgram.enableAttributeArray("aNormal");
+}
+
+void GlWidget::ExecuteCmd(const QString& cmd)
+{
+    QString str=cmd;
+    QRegExp rx("-?[1-9]\\d*\\.\\d*|0+.[0-9]+|-?0\\.\\d*[1-9]\\d*|-?\\d+");
+	int pos = 0;
+	QVector<double> v;
+	while ((pos = rx.indexIn(str, pos)) != -1)
+	{
+		pos += rx.matchedLength();
+		v.push_back(rx.cap(0).toDouble());
+	}
+    if(v.size()!=9)
+    {
+        qDebug()<<"Error: wrong cmd format! "<<v.size();
+        return;
+    }
+    minipt.scene.triangles.push_back({{v[0],v[1],v[2]},{v[3],v[4],v[5]},{v[6],v[7],v[8]}});
+    rebuildVertexArray();
 }

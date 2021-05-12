@@ -13,6 +13,7 @@
 #include <QTime>
 #include <QtMath>
 #include <QKeyEvent>
+#include <QVector>
 
 #include <minipt/minipt.hpp>
 
@@ -47,6 +48,9 @@ private:
     Minipt minipt;
 
     Camera camera;
+
+public slots:
+    void ExecuteCmd(const QString& cmd);
 };
 
 #endif // WIDGET_H
